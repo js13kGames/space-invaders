@@ -1,5 +1,4 @@
-import { clamp } from './math';
-
+import { clamp, lerp as numberLerp } from './math';
 export interface Vector {
   x: number;
   y: number;
@@ -29,6 +28,13 @@ export function slerp(start: Vector, end: Vector, percent: number): Vector
       mulFactor(relative, Math.sin(theta))
     )
   );
+}
+
+export function lerp(start: Vector, end: Vector, percent: number) {
+  return {
+    x: numberLerp(start.x, end.x, percent),
+    y: numberLerp(start.y, end.y, percent)
+  };
 }
 
 export function dot(a: Vector, b: Vector) {

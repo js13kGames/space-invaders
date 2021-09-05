@@ -2,9 +2,14 @@ import { log } from './debug';
 import { init as initGamepad } from './gamepad';
 import { init as initRenderer } from './render';
 import { init as initPhysics } from './physics';
+import { WorldData } from './enemy';
 
 const $canvas = document.querySelector('#canvas') as HTMLCanvasElement;
 
+const worldData: WorldData = {
+  width: 0,
+  height: 0
+};
 resizeCanvas();
 window.addEventListener('resize', resizeCanvas);
 
@@ -25,13 +30,15 @@ function update(time: number) {
   const input = getInput();
   const {
     playerPosition,
-    projectiles
+    projectiles,
+    enemies
   } = calculate({
-    input, deltaTime
+    input, deltaTime, worldData
   });
   draw({
     playerPosition,
-    projectiles
+    projectiles,
+    enemies
   });
   window.requestAnimationFrame(update);
 }
@@ -39,4 +46,6 @@ function update(time: number) {
 function resizeCanvas() {
   $canvas.width = window.innerWidth;
   $canvas.height = window.innerHeight;
+  worldData.width = $canvas.width;
+  worldData.height = $canvas.height;
 }

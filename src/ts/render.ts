@@ -1,9 +1,11 @@
+import { Enemy } from './enemy';
 import { Projectile } from './physics';
 import { Vector } from './vector';
 
 export interface DrawData {
-  playerPosition: Vector,
-  projectiles: Projectile[]
+  playerPosition: Vector;
+  projectiles: Projectile[];
+  enemies: Enemy[];
 }
 
 export function init($canvas: HTMLCanvasElement) {
@@ -13,9 +15,10 @@ export function init($canvas: HTMLCanvasElement) {
   };
 }
 
-function draw($canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, { playerPosition, projectiles }: DrawData) {
+function draw($canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, { playerPosition, projectiles, enemies }: DrawData) {
   drawPlayer();
   drawProjectiles();
+  drawEnemies();
 
  
   function drawPlayer() {
@@ -38,6 +41,20 @@ function draw($canvas: HTMLCanvasElement, ctx: CanvasRenderingContext2D, { playe
       ctx.arc(
         (projectile.position.x) * 50 + $canvas.width / 2,
         (projectile.position.y) * 50 + $canvas.height / 2,
+        5, 0, Math.PI * 2
+      );
+      ctx.closePath();
+      ctx.fill();
+    }
+  }
+
+  function drawEnemies() {
+    for (const enemy of enemies) {
+      ctx.fillStyle = 'green';
+      ctx.beginPath();
+      ctx.arc(
+        enemy.position.x,
+        enemy.position.y,
         5, 0, Math.PI * 2
       );
       ctx.closePath();

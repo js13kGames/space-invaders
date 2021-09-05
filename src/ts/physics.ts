@@ -1,4 +1,5 @@
 import { GAMEPAD_EPSILON, PLAYER_SPEED, FIRE_COOLDOWN, PROJECTILE_SPEED } from './config';
+import { calcNextPosition, Enemy, Type, WorldData } from './enemy';
 import { Input } from './gamepad';
 import { magnitude, slerp, add, mulFactor, Vector, normalize } from './vector';
 
@@ -10,11 +11,13 @@ export interface Projectile {
 export interface PhysicsData {
   input: Input;
   deltaTime: number;
+  worldData: WorldData;
 }
 
 export interface PhysicsOutput {
   playerPosition: Vector;
   projectiles: Projectile[];
+  enemies: Enemy[];
 }
 
 let currentPosition: Vector = {
@@ -28,7 +31,13 @@ let destination: Vector = {
 };
 
 
-const projectiles = [];
+const projectiles: Projectile[] = [];
+
+const enemies: Enemy[] = [{
+  age: 0,
+  position: { x: -100, y: 0 },
+  type: Type.Basic
+}];
 
 let fireTimer = 0;
 
@@ -38,7 +47,7 @@ export function init() {
   };
 }
 
-function calculate({ input, deltaTime }: PhysicsData): PhysicsOutput {
+function calculate({ input, deltaTime, worldData }: PhysicsData): PhysicsOutput {
   const mag = magnitude(input.axes);
   if (mag > GAMEPAD_EPSILON) {
     destination = normalize(input.axes);
@@ -60,8 +69,17 @@ function calculate({ input, deltaTime }: PhysicsData): PhysicsOutput {
     projectile.position = add(projectile.position, (mulFactor(projectile.direction, deltaTime * PROJECTILE_SPEED)));
   }
 
+  for (const enemy of enemies) {
+    enemy.position = calcNextPosition({
+      enemy,
+      deltaTime,
+      worldData
+    });
+  }
+
   return {
     playerPosition: currentPosition,
-    projectiles
+    projectiles,
+    enemies
   };
 }
